@@ -1,0 +1,5 @@
+<div class="container py-4">
+  <h4 class="mb-3 text-primary">Reusable Table Demo</h4>
+
+  <app-table [columns]="columns" [data]="(posts$ | async) || []"></app-table>
+</div>

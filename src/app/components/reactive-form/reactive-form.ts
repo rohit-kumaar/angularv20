@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 export class ReactiveForm {
   API = 'https://jsonplaceholder.typicode.com/posts';
 
-  userForm: FormGroup = new FormGroup({
+  formGroupForUser: FormGroup = new FormGroup({
     id: new FormControl(0),
     title: new FormControl(''),
     body: new FormControl(''),
@@ -28,7 +28,7 @@ export class ReactiveForm {
 
   handleSubmitFn() {
     // debugger;
-    const userFormValue = this.userForm.value;
+    const userFormValue = this.formGroupForUser.value;
 
     this.http.post(this.API, userFormValue).subscribe({
       next: () => alert('User Is Registered'),
@@ -38,7 +38,7 @@ export class ReactiveForm {
   }
 
   editFn(post: any) {
-    this.userForm = new FormGroup({
+    this.formGroupForUser = new FormGroup({
       id: new FormControl(post.id),
       title: new FormControl(post.title),
       body: new FormControl(post.body),
@@ -46,14 +46,14 @@ export class ReactiveForm {
   }
 
   updateFn() {
-    const userFormValue = this.userForm.value;
+    const userFormValue = this.formGroupForUser.value;
     const url = `${this.API}/${userFormValue.id}`;
 
     this.http.put(url, userFormValue).subscribe({
       next: () => alert('User updated successfully!'),
       error: (e) => console.error(e),
       complete: () => {
-        this.userForm = new FormGroup({
+        this.formGroupForUser = new FormGroup({
           id: new FormControl(0),
           title: new FormControl(''),
           body: new FormControl(''),

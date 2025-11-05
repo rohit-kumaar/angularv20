@@ -1,25 +1,25 @@
 <div class="bg-light pt-5">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-9 scrollY">
+      <div class="col-lg-9 scrollY">
         <table class="table table-bordered table-striped">
           <thead class="table-dark">
             <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Body</th>
+              <th>SL NO.</th>
+              <th>Name</th>
+              <th>Email</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            @for (post of posts$ | async; track $index) {
+            @for (user of users$ | async; track $index) {
             <tr>
-              <td>{{ post.id }}</td>
-              <td>{{ post.title }}</td>
-              <td>{{ post.body }}</td>
+              <td>{{ $index }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
               <td style="width: 200px">
-                <button class="btn btn-primary me-2" (click)="editFn(post)">Edit</button>
-                <button class="btn btn-danger" (click)="deleteFn(post.id)">Delete</button>
+                <button class="btn btn-primary me-2" (click)="editFn(user)">Edit</button>
+                <button class="btn btn-danger" (click)="deleteFn(user.id)">Delete</button>
               </td>
             </tr>
             }
@@ -27,38 +27,53 @@
         </table>
       </div>
 
-      <div class="col-3">
+      <div class="col-lg-3">
         <div class="card shadow-sm">
           <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Edit Post (Form)</h5>
+            <h5 class="mb-0">Create User</h5>
           </div>
           <div class="card-body">
-            <form [formGroup]="formGroupForUser">
+            <form [formGroup]="userFormGrp" (ngSubmit)="createUserFn()">
               <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
+                <label for="name" class="form-label">User Name</label>
                 <input
                   type="text"
-                  id="title"
+                  id="name"
                   class="form-control"
-                  placeholder="Enter title"
-                  formControlName="title"
+                  placeholder="Enter User Name"
+                  formControlName="name"
                 />
               </div>
 
               <div class="mb-3">
-                <label for="body" class="form-label">Body</label>
-                <textarea
-                  id="body"
+                <label for="email" class="form-label">Email ID</label>
+                <input
+                  type="text"
+                  id="email"
                   class="form-control"
-                  rows="5"
-                  placeholder="Enter post body"
-                  formControlName="body"
-                ></textarea>
+                  placeholder="Enter Email ID"
+                  formControlName="email"
+                />
               </div>
 
-              @if (formGroupForUser.controls['id'].value === 0) {
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input
+                  type="text"
+                  id="password"
+                  class="form-control"
+                  placeholder="Enter Password"
+                  formControlName="password"
+                />
+              </div>
 
-              <button type="submit" class="btn btn-success w-100" (click)="handleSubmitFn()">
+              @if (userFormGrp.controls['id'].value === 0) {
+
+              <button
+                type="submit"
+                class="btn btn-success w-100"
+                [disabled]="this.userFormGrp.invalid"
+              >
                 Submit
               </button>
 

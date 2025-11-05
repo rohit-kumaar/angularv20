@@ -5,13 +5,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Observable } from 'rxjs';
 
 class NewUser {
-  id: number;
+  id?: any;
   name: string;
   email: string;
   password: string;
 
   constructor() {
-    this.id = 0;
     this.name = '';
     this.email = '';
     this.password = '';
@@ -26,7 +25,6 @@ class NewUser {
 })
 export class ReactiveForm {
   userFormGrp: FormGroup<{
-    id: FormControl<number>;
     name: FormControl<string>;
     email: FormControl<string>;
     password: FormControl<string>;
@@ -34,13 +32,14 @@ export class ReactiveForm {
 
   API = 'http://localhost:3000/users';
   http = inject(HttpClient);
-  users$: Observable<NewUser[]>;
+  users$!: Observable<NewUser[]>;
+  isUpdate: boolean = false;
+  currentId?: any;
 
   constructor() {
     const user = new NewUser();
 
     this.userFormGrp = new FormGroup({
-      id: new FormControl(user.id, { nonNullable: true }),
       name: new FormControl(user.name, {
         nonNullable: true,
         validators: [Validators.required, Validators.minLength(5)],
@@ -55,7 +54,7 @@ export class ReactiveForm {
       }),
     });
 
-    this.users$ = this.http.get<NewUser[]>(this.API);
+    this.loadUserFn();
   }
 
   createUserFn() {
@@ -64,69 +63,52 @@ export class ReactiveForm {
       const userFormGrpVal = this.userFormGrp.value;
       // debugger;
       this.http.post(this.API, userFormGrpVal).subscribe({
-        next: () => alert('User Is Registered'),
+        next: () => this.loadUserFn(),
         error: (e) => console.error(e),
         complete: () => {
-          this.users$ = this.http.get<NewUser[]>(this.API);
-          console.log(userFormGrpVal);
-          console.log('Complete');
           this.userFormGrp.reset();
+          console.log('User Added Successfully');
         },
       });
     }
   }
 
+  loadUserFn() {
+    this.users$ = this.http.get<NewUser[]>(this.API);
+  }
+
   editFn(user: NewUser) {
-    this.userFormGrp = new FormGroup({
-      id: new FormControl(user.id, { nonNullable: true }),
-      name: new FormControl(user.name, {
-        nonNullable: true,
-        validators: [Validators.required, Validators.minLength(5)],
-      }),
-      email: new FormControl(user.email, {
-        nonNullable: true,
-        validators: [Validators.required, Validators.email],
-      }),
-      password: new FormControl(user.password, {
-        nonNullable: true,
-        validators: [Validators.required, Validators.minLength(6)],
-      }),
-    });
+    this.userFormGrp.patchValue(user);
+    this.isUpdate = true;
+    this.currentId = user.id;
   }
 
   updateFn() {
     const userFormGrpVal = this.userFormGrp.value;
-    const url = `${this.API}/${userFormGrpVal.id}`;
-    console.log(url);
+    const url = `${this.API}/${this.currentId}`;
 
     this.http.put(url, userFormGrpVal).subscribe({
-      next: () => alert('User updated successfully!'),
+      next: () => this.loadUserFn(),
       error: (e) => console.error(e),
       complete: () => {
-        this.users$ = this.http.get<NewUser[]>(this.API);
-        this.userFormGrp = new FormGroup({
-          id: new FormControl(0, { nonNullable: true }),
-          name: new FormControl('', { nonNullable: true }),
-          email: new FormControl('', { nonNullable: true }),
-          password: new FormControl('', { nonNullable: true }),
-        });
-        console.log('User Updated');
+        this.userFormGrp.reset(new NewUser());
+        this.isUpdate = false;
+        console.warn('User updated successfully!');
       },
     });
   }
 
   deleteFn(id: number) {
     const url = `${this.API}/${id}`;
+    console.log(url);
+
     const isDelete = confirm('Are you sure you want to delete?');
 
     if (isDelete) {
       this.http.delete(url).subscribe({
-        next: () => alert('User is deleted'),
+        next: () => this.loadUserFn(),
         error: (e) => console.error(e),
-        complete: () => {
-          this.users$ = this.http.get<NewUser[]>(this.API);
-          console.warn('User is deleted');
-        },
+        complete: () => console.warn('User is deleted'),
       });
     }
   }

@@ -33,7 +33,7 @@
             <h5 class="mb-0">Create User</h5>
           </div>
           <div class="card-body">
-            <form [formGroup]="userFormGrp" (ngSubmit)="createUserFn()">
+            <form [formGroup]="userFormGrp">
               <div class="mb-3">
                 <label for="name" class="form-label">User Name</label>
                 <input
@@ -67,19 +67,20 @@
                 />
               </div>
 
-              @if (userFormGrp.controls['id'].value === 0) {
+              @if (!isUpdate) {
 
               <button
-                type="submit"
+                type="button"
                 class="btn btn-success w-100"
                 [disabled]="this.userFormGrp.invalid"
+                (click)="createUserFn()"
               >
                 Submit
               </button>
 
               }@else {
 
-              <button type="submit" class="btn btn-warning w-100" (click)="updateFn()">
+              <button type="button" class="btn btn-warning w-100" (click)="updateFn()">
                 Update
               </button>
 
